@@ -34,7 +34,7 @@ impl<'a> Manufacturer<'a> {
 
 #[tokio::main]
  async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let args = env::args().collect();
+    let args: Vec<String> = env::args().collect();
 
     if args.len() < 2 {
         println!("Usage: {} <search term>", args[0]);
@@ -48,7 +48,16 @@ impl<'a> Manufacturer<'a> {
      let client = reqwest::Client::new();
          let res = client.get(API_URL).send().await?.json::<serde_json::Value>().await?;
 
-         let manufacturer_json = res.as_object().unwrap().iter().find(|key, _| key == &"Results").unwrap().1.as_array().unwrap().iter();
+         let manufacturer_json = res
+             .as_object()
+             .unwrap()
+             .iter()
+             .find(|(key, _)| key == &"Results")
+             .unwrap()
+             .1
+             .as_array()
+             .unwrap()
+             .iter();
 
     let manufacturers = manufacturer_json.map(|manufacturer_json| {
         let obj = manufacturer_json.as_object().unwrap();
@@ -65,6 +74,16 @@ impl<'a> Manufacturer<'a> {
 
     let found_manufacturers = manufacturers.filter(|manufacturer| manufacturer.contains(keyword))
         .collect::<Vec<_>>();
-    Ok(())
-    println!("Hello, world!");
+
+    if found_manufacturers.is_empty() {
+        Err("No manufacturers found".into())
+    } else {
+        println!("Found {} manufacturers:",found_manufacturers.len());
+
+        for (index, man ) in found_manufacturers.iter().enumerate() {
+            println!("Manufacturer #{}", index + 1);
+            println!("{}", man.description());
+        }
+        Ok(())
+    }
 }
