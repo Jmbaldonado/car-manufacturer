@@ -86,4 +86,4 @@ impl<'a> Manufacturer<'a> {
         }
         Ok(())
     }
-}
+
