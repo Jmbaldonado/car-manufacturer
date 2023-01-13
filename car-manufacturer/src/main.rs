@@ -20,7 +20,28 @@ impl<'a> Contains for Manufacturer<'a> {
             .contains(needle) || self.country.unwrap_or_default().contains(needle)
     }
 }
-    fn main() {
+
+impl<'a> Manufacturer<'a> {
+    fn description(&self) -> String {
+        let name = self.name.unwrap_or_default();
+        let common_name = self.common_name.unwrap_or_default();
+        let country = self.country.unwrap_or_default();
+
+        format!("\tName: {}\n\tCommon Name: {}\n\tCountry: {}", name, common_name, country)
+    }
+}
+
+#[tokio::main]
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let args = env::args().collect();
+
+    if args.len() < 2 {
+        println!("Usage: {} <search term>", args[0]);
+        return Ok(());
+    }
+
+    let keyword = &args[1];
+    Ok(())
     println!("Hello, world!");
     println!("This is my first commit!");
 }
