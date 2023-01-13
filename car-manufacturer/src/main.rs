@@ -43,21 +43,21 @@ impl<'a> Manufacturer<'a> {
 
     let keyword = &args[1];
 
-     let rt = Runtime::new();
+    let rt = Runtime::new();
 
-     let client = reqwest::Client::new();
-         let res = client.get(API_URL).send().await?.json::<serde_json::Value>().await?;
+    let client = reqwest::Client::new();
+    let res = client.get(API_URL).send().await?.json::<serde_json::Value>().await?;
 
-         let manufacturer_json = res
-             .as_object()
-             .unwrap()
-             .iter()
-             .find(|(key, _)| key == &"Results")
-             .unwrap()
-             .1
-             .as_array()
-             .unwrap()
-             .iter();
+    let manufacturer_json = res
+        .as_object()
+        .unwrap()
+        .iter()
+        .find(|(key, _)| key == &"Results")
+        .unwrap()
+        .1
+        .as_array()
+        .unwrap()
+        .iter();
 
     let manufacturers = manufacturer_json.map(|manufacturer_json| {
         let obj = manufacturer_json.as_object().unwrap();
@@ -78,12 +78,13 @@ impl<'a> Manufacturer<'a> {
     if found_manufacturers.is_empty() {
         Err("No manufacturers found".into())
     } else {
-        println!("Found {} manufacturers:",found_manufacturers.len());
+        println!("Found {} manufacturers:", found_manufacturers.len());
 
-        for (index, man ) in found_manufacturers.iter().enumerate() {
+        for (index, man) in found_manufacturers.iter().enumerate() {
             println!("Manufacturer #{}", index + 1);
             println!("{}", man.description());
         }
         Ok(())
     }
+}
 
