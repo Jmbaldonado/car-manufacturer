@@ -1,6 +1,7 @@
 #![deny(clippy::all)]
 
 use std::env;
+use tokio::runtime::Runtime;
 
 const API_URL: &str = "https://vpic.nhtsa.dot.gov/api/vehicles/GetAllManufacturers?format=json";
 
@@ -32,7 +33,7 @@ impl<'a> Manufacturer<'a> {
 }
 
 #[tokio::main]
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = env::args().collect();
 
     if args.len() < 2 {
@@ -41,6 +42,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let keyword = &args[1];
+
+     let rt = Runtime::new();
+
+     let client = reqwest::Client::new();
+         let res = client.get(API_URL).send().await?.json::<serde_json::Value>().await?;
+
+         let manufacturer_json = res.as_object().unwrap().iter().find(|key, _| key == &"Results").unwrap().1.as_array().unwrap().iter();
     Ok(())
     println!("Hello, world!");
     println!("This is my first commit!");
