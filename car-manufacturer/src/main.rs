@@ -49,6 +49,22 @@ impl<'a> Manufacturer<'a> {
          let res = client.get(API_URL).send().await?.json::<serde_json::Value>().await?;
 
          let manufacturer_json = res.as_object().unwrap().iter().find(|key, _| key == &"Results").unwrap().1.as_array().unwrap().iter();
+
+    let manufacturers = manufacturer_json.map(|manufacturer_json| {
+        let obj = manufacturer_json.as_object().unwrap();
+        let country = obj.get("Country").unwrap().as_str();
+        let common_name = obj.get("Mfr_CommonName").unwrap().as_str();
+        let name = obj.get("Mfr_Name").unwrap().as_str();
+
+        Manufacturer {
+            name,
+            common_name,
+            country
+        }
+    });
+
+    let found_manufacturers = manufacturers.filter(|manufacturer| manufacturer.contains(keyword))
+        .collect::<Vec<_>>();
     Ok(())
     println!("Hello, world!");
 }
